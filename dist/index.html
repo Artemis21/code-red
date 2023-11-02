@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - Code Formatter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div class="sidebar">
+  <h1 class="header">
+    Code
+    <span class="header__red">Red</span>
+  </h1>
+  <h2 class="sub">colour your code
+    <button class="link" id="header_help">(?)</button>
+  </h2>
+  <div class="actions">
+    <button class="action action--tab" id="paste">Paste</button>or
+    <label class="action" id="upload_label" for="upload">Upload
+      <input class="hidden" id="upload" type="file" multiple="multiple"/>
+    </label>files or a
+    <label class="action" for="folder">Folder
+      <input class="hidden" id="folder" type="file" directory="directory" webkitdirectory="webkitdirectory"/>
+    </label>
+  </div>
+  <textarea class="entry" id="code"></textarea>
+  <div class="files hidden" id="files_outer">
+    <div class="files__action" id="clear_files">Clear files</div>
+    <div id="files"></div>
+  </div>
+  <div class="error hidden" id="error"></div>
+  <details class="options">
+    <summary class="options__title">Options</summary>
+    <div class="options__inner">
+      <label class="options__option" for="line_numbers">
+        <input class="options__option__input" id="line_numbers" type="checkbox" checked="checked"/>Include line numbers
+      </label>
+      <label class="options__option" id="first_line_number_label" for="first_line_number">Line numbers start from
+        <input class="options__option__input options__option__input--number" id="first_line_number" type="number" min="0" step="1" value="1" required="required"/>
+      </label>
+    </div>
+  </details>
+</div>
+<main class="main">
+  <button class="action action--feedback" id="copy" title="Input code to copy the formatted version" disabled="disabled">Copy
+    <div class="action__feedback">Copied!</div>
+  </button>
+  <div class="output hidden" id="output"></div><code class="output__placeholder" id="placeholder">Input some code to see it here...</code>
+</main>
+<div class="modal hidden" id="about">
+  <div class="modal__inner">
+    <h2 class="modal__header">About</h2>
+    <p class="modal__text">Sometimes, you need to include a code snippet (or even a whole code listing!) in a text document. It can be hard to make code look good in this context, and no-one wants to do syntax highlighting by hand.</p>
+    <p class="modal__text">Code Red makes it easy to include pretty highlighted code in your documents. Paste, drop or upload some text, files or even folders, copy the result and go!</p>
+    <p class="modal__text">Tested with Google Docs and Microsoft Word, but should work with any rich text editor that supports pasting HTML data.</p>
+    <button class="action" id="modal_close">Ok</button>
+  </div>
+</div>
+<footer class="footer">
+  <div class="footer__icon">&copy;</div>
+  <div class="footer__text">Artemis Vellacott 2023 •</div>
+  <button class="link footer_text" id="footer_help">About</button>
+</footer>
+<!-- partial -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'></script><script  src="./script.js"></script>
+
+</body>
+</html>

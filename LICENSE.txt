@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) 2023 Artemis (https://codepen.io/artemisv/pen/ExGBogN)
+Copyright (c) 2024 AM Vellacott (https://codepen.io/artemisv/pen/ExGBogN)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -354,15 +354,18 @@ function renderCode(codeText, parentEl) {
 }
 
 function addLineNumbers(el) {
-  const lineCount = (el.innerHTML.match(/\n/g) || []).length + 1;
-  const numLength = lineCount.toString().length;
   let nextLine = source.isModeText() ? source.getFirstLineNumber() : 1;
-  const NBSP = "\xa0";
-  const next = () => {
-    const num = (nextLine++).toString().padStart(numLength, NBSP);
-    return `<span class="output__code__linenumber">${num}${NBSP}</span>`;
-  };
-  el.innerHTML = next() + el.innerHTML.replaceAll("\n", () => "\n" + next());
+  const rows = el.innerHTML
+    .split("\n")
+    .map((line, n) => {
+      const num = `<td style="padding:0 0.5em 0 0;text-align:right">${nextLine++}</td>`;
+      const code = `<td style="padding:0">${line}</td>`;
+      return `<tr style="height:0">${num}${code}</tr>`;
+    })
+    .join("");
+  const numWidth = 16 * nextLine.toString().length;
+  const cols = `<colgroup><col width="${numWidth}" /><col /></colgroup>`;
+  el.innerHTML = `<table>${cols}<tbody>${rows}</tbody></table>`;
 }
 
 function enableFirstLineNumber() {

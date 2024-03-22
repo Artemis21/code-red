@@ -31,6 +31,9 @@ const C_DISABLE_LINE_NUMBERS = "disable_line_numbers";
 // Event for changing the number line numbers start from.
 const C_SET_FIRST_LINE_NUMBER = "set_first_line_number";
 
+// Event for changing the rendered font size.
+const C_SET_FONT_SIZE = "set_font_size";
+
 // Event for the error message being shown.
 const C_SHOW_ERROR = "show_error";
 
@@ -56,6 +59,7 @@ class SourceData {
   #error = "";
   #showAbout = false;
   #callbacks = new Map();
+  #fontSize = 16;
 
   on(event, cb) {
     const cbs = this.#callbacks.get(event) || [];
@@ -178,6 +182,11 @@ class SourceData {
     this.#trigger(C_DISABLE_LINE_NUMBERS, []);
   }
 
+  setFontSize(size) {
+    this.#fontSize = size;
+    this.#trigger(C_SET_FONT_SIZE, [size]);
+  }
+
   setLineNumbersEnabled(enabled) {
     if (enabled) {
       this.enableLineNumbers();
@@ -233,6 +242,7 @@ const placeholderEl = E("placeholder");
 const lineNumbersInp = E("line_numbers");
 const firstLineNumberInp = E("first_line_number");
 const firstLineNumberLabel = E("first_line_number_label");
+const fontSizeInp = E("font_size");
 const errorOut = E("error");
 const aboutModal = E("about");
 const modalCloseBtn = E("modal_close");
@@ -313,6 +323,12 @@ function removeAllLineNumbers() {
     .forEach((el) => el.remove());
 }
 
+function setFontSize(size) {
+  outputEl.style.setProperty("--font-size", `${size}px`);
+  console.log("hereeee");
+  hardCodeRendering(outputEl);
+}
+
 source.on(C_ENABLE_LINE_NUMBERS, () => {
   addAllLineNumbers();
   if (source.isModeText()) enableFirstLineNumber();
@@ -324,6 +340,8 @@ source.on(C_DISABLE_LINE_NUMBERS, () => {
 });
 
 source.on(C_SET_FIRST_LINE_NUMBER, addAllLineNumbers);
+
+source.on(C_SET_FONT_SIZE, setFontSize);
 
 source.on(C_SHOW_ERROR, () => errorOut.classList.remove("hidden"));
 
@@ -498,6 +516,12 @@ lineNumbersInp.onclick = () => {
   source.setLineNumbersEnabled(lineNumbersInp.checked);
 };
 
+fontSizeInp.oninput = () => {
+  fontSizeInp.reportValidity();
+  if (!fontSizeInp.checkValidity()) return;
+  source.setFontSize(fontSizeInp.value);
+};
+
 pasteBtn.onclick = () => firePromise(readClipboard(source));
 
 clearFilesBtn.onclick = () => {
@@ -557,6 +581,14 @@ aboutModal.onclick = (e) => {
 
 modalCloseBtn.onclick = () => source.hideAbout();
 
+const HARD_CODE_PROPS = [
+  "color",
+  "font-weight",
+  "font-family",
+  "font-style",
+  "font-size"
+];
+
 /**
  * Set the `style` attribute on a given element and all its descendants so that
  * even when the HTML source is taken in isolation, the text is rendered as it
@@ -565,20 +597,49 @@ modalCloseBtn.onclick = () => source.hideAbout();
  * @param {Element} el
  */
 function hardCodeRendering(el) {
+  // reset first so that computed props are not based on previously
+  // hardcoded props
+  clearHardCoded(el);
+  setHardCoded(el);
+
+  for (const prop of HARD_CODE_PROPS) {
+    el.style[prop] = "";
+  }
   let style = window.getComputedStyle(el, null);
   if (el.innerHTML === "") return;
-  for (const prop of [
-    "color",
-    "font-weight",
-    "font-family",
-    "font-style",
-    "font-size"
-  ]) {
+  for (const prop of HARD_CODE_PROPS) {
     el.style[prop] = style.getPropertyValue(prop);
   }
   el.spellcheck = false;
   for (const child of el.children) {
-    hardCodeRendering(child);
+    setHardCoded(child);
+  }
+}
+
+/** Remove hardcoded props from the given element and all descendants. **/
+function clearHardCoded(el) {
+  for (const prop of HARD_CODE_PROPS) {
+    el.style[prop] = "";
+  }
+  for (const child of el.children) {
+    clearHardCoded(child);
+  }
+}
+
+/**
+ * Hardcode the relevant props for the given element and all descendants.
+ * This does not reset the props first, so existing hardcoded props will not
+ * change. See also `hardCodeRendering`.
+ */
+function setHardCoded(el) {
+  let style = window.getComputedStyle(el, null);
+  if (el.innerHTML === "") return;
+  for (const prop of HARD_CODE_PROPS) {
+    el.style[prop] = style.getPropertyValue(prop);
+  }
+  el.spellcheck = false;
+  for (const child of el.children) {
+    setHardCoded(child);
   }
 }
 

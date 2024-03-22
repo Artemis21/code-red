@@ -24,10 +24,10 @@
   details.options
     summary.options__title Options
     .options__inner
-      label.options__option(for="line_numbers")
+      label.options__option
         input#line_numbers.options__option__input(type="checkbox", checked)
         | Include line numbers
-      label#first_line_number_label.options__option(for="first_line_number")
+      label#first_line_number_label.options__option
         | Line numbers start from
         input#first_line_number.options__option__input.options__option__input--number(
           type="number",
@@ -36,6 +36,16 @@
           value=1,
           required
         )
+      label.options__option
+        | Font size:
+        input#font_size.options__option__input.options__option__input--number(
+          type="number",
+          min=1,
+          step=1,
+          value=16,
+          required
+        )
+        | px
 
 main.main
   button#copy.action.action--feedback(

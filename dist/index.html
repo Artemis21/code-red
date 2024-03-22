@@ -35,11 +35,14 @@
   <details class="options">
     <summary class="options__title">Options</summary>
     <div class="options__inner">
-      <label class="options__option" for="line_numbers">
+      <label class="options__option">
         <input class="options__option__input" id="line_numbers" type="checkbox" checked="checked"/>Include line numbers
       </label>
-      <label class="options__option" id="first_line_number_label" for="first_line_number">Line numbers start from
+      <label class="options__option" id="first_line_number_label">Line numbers start from
         <input class="options__option__input options__option__input--number" id="first_line_number" type="number" min="0" step="1" value="1" required="required"/>
+      </label>
+      <label class="options__option">Font size:
+        <input class="options__option__input options__option__input--number" id="font_size" type="number" min="1" step="1" value="16" required="required"/>px
       </label>
     </div>
   </details>

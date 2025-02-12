@@ -2,13 +2,14 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <title>CodePen - Code Formatter</title>
+  <title>Code Formatter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Code Red</title><link rel="stylesheet" href="./style.css">
 
 </head>
 <body>
 <!-- partial:index.partial.html -->
+<!DOCTYPE html>
 <div class="sidebar">
   <h1 class="header">
     Code
@@ -20,10 +21,10 @@
   <div class="actions">
     <button class="action action--tab" id="paste">Paste</button>or
     <label class="action" id="upload_label" for="upload">Upload
-      <input class="hidden" id="upload" type="file" multiple="multiple"/>
+      <input class="hidden" id="upload" type="file" multiple>
     </label>files or a
     <label class="action" for="folder">Folder
-      <input class="hidden" id="folder" type="file" directory="directory" webkitdirectory="webkitdirectory"/>
+      <input class="hidden" id="folder" type="file" directory webkitdirectory>
     </label>
   </div>
   <textarea class="entry" id="code"></textarea>
@@ -36,19 +37,27 @@
     <summary class="options__title">Options</summary>
     <div class="options__inner">
       <label class="options__option">
-        <input class="options__option__input" id="line_numbers" type="checkbox" checked="checked"/>Include line numbers
+        <input class="options__option__input" id="line_numbers" type="checkbox" checked>Include line numbers
       </label>
       <label class="options__option" id="first_line_number_label">Line numbers start from
-        <input class="options__option__input options__option__input--number" id="first_line_number" type="number" min="0" step="1" value="1" required="required"/>
+        <input class="options__option__input options__option__input--number" id="first_line_number" type="number" min="0" step="1" value="1" required>
       </label>
       <label class="options__option">Font size:
-        <input class="options__option__input options__option__input--number" id="font_size" type="number" min="1" step="1" value="16" required="required"/>px
+        <input class="options__option__input options__option__input--number" id="font_size" type="number" min="1" step="1" value="12" required>pt
+      </label>
+      <label class="options__option">Font family:
+        <input class="options__option__input" id="font_family" type="text" value="Courier New">
+      </label>
+      <label class="options__option">Language:
+        <select class="options__option__input" id="language" value="auto">
+          <option value="">auto</option>
+        </select>
       </label>
     </div>
   </details>
 </div>
 <main class="main">
-  <button class="action action--feedback" id="copy" title="Input code to copy the formatted version" disabled="disabled">Copy
+  <button class="action action--feedback" id="copy" title="Input code to copy the formatted version" disabled>Copy
     <div class="action__feedback">Copied!</div>
   </button>
   <div class="output hidden" id="output"></div><code class="output__placeholder" id="placeholder">Input some code to see it here...</code>
@@ -64,7 +73,7 @@
 </div>
 <footer class="footer">
   <div class="footer__icon">&copy;</div>
-  <div class="footer__text">Artemis Vellacott 2023 •</div>
+  <div class="footer__text">Miriam Vellacott 2025 •</div>
   <button class="link footer_text" id="footer_help">About</button>
 </footer>
 <!-- partial -->

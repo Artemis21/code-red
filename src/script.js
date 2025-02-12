@@ -34,6 +34,12 @@ const C_SET_FIRST_LINE_NUMBER = "set_first_line_number";
 // Event for changing the rendered font size.
 const C_SET_FONT_SIZE = "set_font_size";
 
+// Event for changing the rendered font family.
+const C_SET_FONT_FAMILY = "set_font_family";
+
+// Event for changing the highlighting language.
+const C_SET_LANGUAGE = "set_language";
+
 // Event for the error message being shown.
 const C_SHOW_ERROR = "show_error";
 
@@ -59,7 +65,9 @@ class SourceData {
   #error = "";
   #showAbout = false;
   #callbacks = new Map();
-  #fontSize = 16;
+  #fontSize = 12;
+  #fontFamily = `"Courier New"`;
+  #language = null;
 
   on(event, cb) {
     const cbs = this.#callbacks.get(event) || [];
@@ -187,6 +195,20 @@ class SourceData {
     this.#trigger(C_SET_FONT_SIZE, [size]);
   }
 
+  setFontFamily(family) {
+    this.#fontFamily = family;
+    this.#trigger(C_SET_FONT_FAMILY, [family]);
+  }
+
+  setLanguage(language) {
+    this.#language = language;
+    this.#trigger(C_SET_LANGUAGE, [language]);
+  }
+
+  getLanguage() {
+    return this.#language;
+  }
+
   setLineNumbersEnabled(enabled) {
     if (enabled) {
       this.enableLineNumbers();
@@ -243,11 +265,20 @@ const lineNumbersInp = E("line_numbers");
 const firstLineNumberInp = E("first_line_number");
 const firstLineNumberLabel = E("first_line_number_label");
 const fontSizeInp = E("font_size");
+const fontFamilyInp = E("font_family");
+const languageInp = E("language");
 const errorOut = E("error");
 const aboutModal = E("about");
 const modalCloseBtn = E("modal_close");
 const headerHelpBtn = E("header_help");
 const footerHelpBtn = E("footer_help");
+
+for (const lang of hljs.listLanguages()) {
+  const el = document.createElement("option");
+  el.setAttribute("value", lang);
+  el.innerText = lang;
+  languageInp.appendChild(el);
+}
 
 source.on(C_SET_MODE_TEXT, () => {
   pasteBtn.classList.add("action--tab");
@@ -270,11 +301,15 @@ source.on(C_SET_TEXT_CONTENT, () => {
   codeInp.value = text;
   if (text === "") return;
   outputEl.innerHTML = "";
-  renderCode(text, outputEl);
+  renderTextContent();
   placeholderEl.classList.add("hidden");
   outputEl.classList.remove("hidden");
   copyBtn.disabled = false;
 });
+
+function renderTextContent() {
+  renderCode(source.getTextContent(), outputEl);
+}
 
 source.on(C_ADD_FILE, (id) => {
   const { name, content } = source.getFile(id);
@@ -284,6 +319,13 @@ source.on(C_ADD_FILE, (id) => {
   nameIn.onclick = () => source.removeFile(id);
   nameIn.dataset.fileId = id;
   filesInp.appendChild(nameIn);
+  renderFile(id);
+  placeholderEl.classList.add("hidden");
+  outputEl.classList.remove("hidden");
+  copyBtn.disabled = false;
+});
+
+function renderFile(id) {
   const nameOut = document.createElement("h3");
   nameOut.classList.add("output__filename");
   nameOut.innerText = name;
@@ -291,10 +333,7 @@ source.on(C_ADD_FILE, (id) => {
   outputEl.appendChild(nameOut);
   hardCodeRendering(nameOut);
   renderCode(content, outputEl).dataset.fileId = id;
-  placeholderEl.classList.add("hidden");
-  outputEl.classList.remove("hidden");
-  copyBtn.disabled = false;
-});
+}
 
 source.on(C_REMOVE_FILE, (id) => {
   document.querySelectorAll(`[data-file-id="${id}"]`).forEach((el) => {
@@ -318,14 +357,16 @@ function addAllLineNumbers() {
 }
 
 function removeAllLineNumbers() {
-  document
-    .querySelectorAll(".output__code__linenumber")
-    .forEach((el) => el.remove());
+  document.querySelectorAll(".output__code code").forEach(removeLineNumbers);
 }
 
 function setFontSize(size) {
-  outputEl.style.setProperty("--font-size", `${size}px`);
-  console.log("hereeee");
+  outputEl.style.setProperty("--font-size", `${size}pt`);
+  hardCodeRendering(outputEl);
+}
+
+function setFontFamily(family) {
+  outputEl.style.setProperty("--font-family", `"${family}"`);
   hardCodeRendering(outputEl);
 }
 
@@ -343,6 +384,10 @@ source.on(C_SET_FIRST_LINE_NUMBER, addAllLineNumbers);
 
 source.on(C_SET_FONT_SIZE, setFontSize);
 
+source.on(C_SET_FONT_FAMILY, setFontFamily);
+
+source.on(C_SET_LANGUAGE, rerenderAll);
+
 source.on(C_SHOW_ERROR, () => errorOut.classList.remove("hidden"));
 
 source.on(C_HIDE_ERROR, () => errorOut.classList.add("hidden"));
@@ -358,12 +403,20 @@ source.on(C_HIDE_ABOUT, () => aboutModal.classList.add("hidden"));
 
 hljs.configure({ useBr: true });
 
+function rerenderAll() {
+  outputEl.innerHTML = "";
+  if (source.isModeText()) renderTextContent();
+  else source.getFileIds().forEach(renderFile);
+}
+
 function renderCode(codeText, parentEl) {
   const render = document.createElement("code");
   render.textContent = codeText;
+  const language = source.getLanguage();
+  if (language) render.classList.add(`language-${language}`);
   hljs.highlightElement(render);
-  if (source.isLineNumbersEnabled()) addLineNumbers(render);
   const pre = document.createElement("pre");
+  if (source.isLineNumbersEnabled()) addLineNumbers(render);
   pre.appendChild(render);
   pre.classList.add("output__code");
   parentEl.appendChild(pre);
@@ -377,13 +430,21 @@ function addLineNumbers(el) {
     .split("\n")
     .map((line, n) => {
       const num = `<td style="padding:0 0.5em 0 0;text-align:right">${nextLine++}</td>`;
-      const code = `<td style="padding:0">${line}</td>`;
+      const code = `<td style="padding:0" class="output__code__line">${line}</td>`;
       return `<tr style="height:0">${num}${code}</tr>`;
     })
     .join("");
   const numWidth = 16 * nextLine.toString().length;
   const cols = `<colgroup><col width="${numWidth}" /><col /></colgroup>`;
   el.innerHTML = `<table>${cols}<tbody>${rows}</tbody></table>`;
+}
+
+function removeLineNumbers(el) {
+  if (el.querySelector("table") === null) return;
+  const code = [...el.querySelectorAll(".output__code__line")]
+    .map((td) => td.innerHTML)
+    .join("\n");
+  el.innerHTML = code;
 }
 
 function enableFirstLineNumber() {
@@ -522,6 +583,14 @@ fontSizeInp.oninput = () => {
   source.setFontSize(fontSizeInp.value);
 };
 
+fontFamilyInp.oninput = () => {
+  source.setFontFamily(fontFamilyInp.value);
+};
+
+languageInp.oninput = () => {
+  source.setLanguage(languageInp.value || null);
+};
+
 pasteBtn.onclick = () => firePromise(readClipboard(source));
 
 clearFilesBtn.onclick = () => {
@@ -608,6 +677,9 @@ function hardCodeRendering(el) {
   let style = window.getComputedStyle(el, null);
   if (el.innerHTML === "") return;
   for (const prop of HARD_CODE_PROPS) {
+    if (prop == "font-family") {
+      console.log("1", el, style.getPropertyValue(prop));
+    }
     el.style[prop] = style.getPropertyValue(prop);
   }
   el.spellcheck = false;
@@ -635,6 +707,9 @@ function setHardCoded(el) {
   let style = window.getComputedStyle(el, null);
   if (el.innerHTML === "") return;
   for (const prop of HARD_CODE_PROPS) {
+    if (prop == "font-family") {
+      console.log("2", el, style.getPropertyValue(prop));
+    }
     el.style[prop] = style.getPropertyValue(prop);
   }
   el.spellcheck = false;

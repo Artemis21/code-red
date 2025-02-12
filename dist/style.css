@@ -270,14 +270,15 @@ body {
 .output {
   margin: 1rem 0 0 0;
   overflow: auto;
-  --font-size: 16px;
+  --font-size: 12pt;
+  --font-family: "Courier New";
   font-size: var(--font-size);
 }
 
 .output__placeholder {
   color: #93a1a1;
   user-select: none;
-  font-family: "Courier New", monospace;
+  font-family: var(--font-family), monospace;
   margin: 1rem 0;
 }
 
@@ -286,7 +287,7 @@ body {
   font-style: italic;
   font-size: 0.9em;
   margin: 1rem 0 0 0;
-  font-family: "Courier New", monospace;
+  font-family: var(--font-family), monospace;
 }
 .output__filename:first-child {
   margin: 0;
@@ -294,8 +295,12 @@ body {
 
 .output__code {
   overflow-x: auto;
-  font-family: "Courier New", monospace;
+  font-family: var(--font-family), monospace;
   margin: 0;
+}
+
+.output__code code {
+  font-family: var(--font-family), monospace;
 }
 
 .output__code__linenumber {

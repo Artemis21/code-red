@@ -1,3 +1,4 @@
+doctype html
 .sidebar
   h1.header
     | Code
@@ -42,10 +43,20 @@
           type="number",
           min=1,
           step=1,
-          value=16,
+          value=12,
           required
         )
-        | px
+        | pt
+      label.options__option
+        | Font family:
+        input#font_family.options__option__input(
+          type="text",
+          value="Courier New"
+        )
+      label.options__option
+        | Language:
+        select#language.options__option__input(value="auto")
+          option(value="") auto
 
 main.main
   button#copy.action.action--feedback(
@@ -66,5 +77,5 @@ main.main
 
 footer.footer
   .footer__icon &copy;
-  .footer__text Artemis Vellacott 2023 •
+  .footer__text Miriam Vellacott 2025 •
   button#footer_help.link.footer_text About
